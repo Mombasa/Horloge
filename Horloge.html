@@ -1,1 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Horloge Canvas</title>
+    <style type="text/css">
+        html {
+          background-color: #111;
+        }
+        body{
+          overflow: hidden;
+          margin: 0;
+          padding: 0;
+          transform: rotate(-90deg);
+        }
+    </style>
+</head>
+<body>
+    <canvas></canvas>
+    <script type="text/javascript">
+        var canvas = document.querySelector('canvas'),
+        ctx = canvas.getContext('2d'),
+        w = canvas.width = window.innerWidth,
+        h = canvas.height = window.innerHeight,
+        cX = w / 2,
+        cY = h / 2;
+      
+        var pos = {
+            x: 0,
+            y: 0
+        }
 
+        var timer = 0;
+        var d = new Date();
+        var dgt = {
+           h : d.getHours(),
+           m : d.getMinutes(),
+           s : d.getSeconds(),
+           ms : 1/60,
+        };
+
+        // Fixing Angles
+        dgt.m += dgt.s / 60 ;
+        dgt.h += dgt.m / 60 ;
+
+        function update(){
+          dgt.s += 1*(1/60);
+          dgt.m += 1*(1/60)/60;
+          dgt.h += 1*((1/60)/60)/12;
+          if (dgt.s >= 60) dgt.s = 0;
+          if (dgt.m >= 60) dgt.m = 0;
+          if (dgt.h >= 24) dgt.h = 0;
+        }
+          
+        function draw(){
+          ctx.save();
+        
+          ctx.globalCompositeOperation = 'source-over';
+          ctx.fillStyle = 'rgba(49,0,92,1)';
+          ctx.fillRect(0, 0, w, h);
+
+          // Background
+          ctx.beginPath();
+          ctx.arc(cX, cY, 75, 0, 2 * Math.PI, false);
+          ctx.fillStyle = 'rgba(29,0,64,1)';
+          ctx.fill();
+          ctx.closePath();
+
+          // Hours
+          ctx.beginPath();
+          ctx.moveTo(cX, cY);
+          ctx.lineTo(
+            (cX + Math.cos(dgt.h*(Math.PI*2)/12)*24),
+            (cY + Math.sin(dgt.h*(Math.PI*2)/12)*24)
+            );
+          ctx.strokeStyle = 'rgba(165,0,123,1)';
+          ctx.lineWidth = 4;
+          ctx.stroke();
+          ctx.closePath();
+
+          // Minutes
+          ctx.beginPath();
+          ctx.moveTo(cX, cY);
+          ctx.lineTo(
+            (cX + Math.cos(dgt.m*(Math.PI*2)/60)*40),
+            (cY + Math.sin(dgt.m*(Math.PI*2)/60)*40)
+            );
+          ctx.strokeStyle = 'rgba(218,2,102,1)';
+          ctx.lineWidth = 4;
+          ctx.stroke();
+          ctx.closePath();
+
+          // Create gradient
+          var grd = ctx.createLinearGradient(cX, cY, (cX + Math.cos(dgt.s*(Math.PI*2)/60)*60), (cY + Math.sin(dgt.s*(Math.PI*2)/60)*60));
+          grd.addColorStop(0, 'rgba(245,31,86,1)');
+          grd.addColorStop(1, 'rgba(245,229,86,1)');
+          
+          // Seconds
+          ctx.beginPath();
+          ctx.moveTo(cX, cY);
+          ctx.lineTo(
+            (cX + Math.cos(dgt.s*(Math.PI*2)/60)*55),
+            (cY + Math.sin(dgt.s*(Math.PI*2)/60)*55)
+            );
+          ctx.strokeStyle = grd;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.closePath();
+         
+          // Case
+          ctx.beginPath();
+          ctx.arc(cX, cY, 75, 0, 2 * Math.PI, false);
+          ctx.strokeStyle = 'rgba(39,0,74,1)';
+          ctx.lineWidth = 20;
+          ctx.stroke();
+          ctx.closePath();
+
+          ctx.beginPath();
+          ctx.arc(cX, cY, 75, 0, 2 * Math.PI, false);
+          ctx.strokeStyle = 'rgba(139,0,74,0.5)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.closePath();
+
+          ctx.beginPath();
+          ctx.arc(cX, cY, 80, 0, ((2 * Math.PI * dgt.s)), false);
+          ctx.strokeStyle = 'rgba(239,0,74,0.6)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.closePath();
+
+          ctx.beginPath();
+          ctx.arc(cX, cY, 80, 0, ((dgt.s)*(2*Math.PI)/60), false);
+          ctx.strokeStyle = 'rgba(239,255,74,1)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.closePath();
+
+          ctx.beginPath();
+          ctx.arc(cX, cY, 85, 0, (((dgt.s)*(2*Math.PI)/60)) , false);
+          ctx.strokeStyle = 'rgba(29,255,174,1)';
+          ctx.lineWidth = 5;
+          ctx.stroke();
+          ctx.closePath();
+
+          ctx.beginPath();
+          ctx.arc(cX, cY, 2, 0, 2 * Math.PI, false);
+          ctx.strokeStyle = 'rgba(29,255,174,1)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.fill();
+          ctx.closePath();
+
+          // Graduations
+          for (var i = 0; i <= 59; i++) {
+            ctx.beginPath();
+            ctx.moveTo((cX + Math.cos(i*(Math.PI*2)/60)*65),(cY + Math.sin(i*(Math.PI*2)/60)*65));
+            ctx.lineTo((cX + Math.cos(i*(Math.PI*2)/60)*70),(cY + Math.sin(i*(Math.PI*2)/60)*70));
+            ctx.strokeStyle = 'rgba(218,95,172,1)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+          }
+
+          for (var i = 0; i <= 11; i++) {
+            ctx.beginPath();
+            ctx.moveTo((cX + Math.cos(i*(Math.PI*2)/12)*70),(cY + Math.sin(i*(Math.PI*2)/12)*70));
+            ctx.lineTo((cX + Math.cos(i*(Math.PI*2)/12)*75),(cY + Math.sin(i*(Math.PI*2)/12)*75));
+            ctx.strokeStyle = 'rgba(218,65,102,1)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.closePath();
+          }
+
+          // Text
+          ctx.font = "20px Arial";
+          ctx.fillStyle = 'rgba(218,2,102,1)';
+          ctx.rotate(Math.PI/2);
+          ctx.fillText(Math.floor(dgt.h) + "h " + Math.floor(dgt.m)+ "m "+ Math.floor(dgt.s) + "s", cX-440, cY-1050);
+          
+          ctx.restore();
+        }
+
+        window.requestAnimFrame = (function() {
+            return window.requestAnimationFrame ||
+                window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                function(callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        })();
+
+        (function loop() {
+            update();
+            draw();
+            requestAnimFrame(loop);
+        })();
+    </script>
+</body>
+</html>
